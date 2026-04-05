@@ -6,7 +6,8 @@
 <title>Senna Tetris - Homenagem a Ayrton Senna</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Racing+Sans+One&display=swap');
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+button{touch-action:manipulation;cursor:pointer}
 html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Arial,sans-serif;background:#000}
 #game-container{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;position:relative;overflow:hidden}
 #bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
@@ -51,8 +52,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Arial,sa
 .intro-dots{position:absolute;bottom:70px;display:flex;gap:8px;z-index:51}
 .intro-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.3);transition:background 0.3s,transform 0.3s}
 .intro-dot.active{background:#FFD700;transform:scale(1.3)}
-#intro-start-btn{position:absolute;bottom:15px;z-index:51;padding:14px 50px;font-size:16px;background:linear-gradient(135deg,#E53935,#FFD700);color:#fff;border:none;border-radius:30px;cursor:pointer;font-weight:bold;text-transform:uppercase;letter-spacing:3px;box-shadow:0 0 30px rgba(255,215,0,0.4);font-family:'Orbitron',sans-serif;opacity:0;transition:opacity 0.5s;pointer-events:none}
-#intro-start-btn.visible{opacity:1;pointer-events:auto;animation:pulse 2s infinite}
+#intro-start-btn{position:absolute;bottom:18px;z-index:51;padding:16px 50px;font-size:16px;background:linear-gradient(135deg,#E53935,#FFD700);color:#fff;border:none;border-radius:30px;font-weight:bold;text-transform:uppercase;letter-spacing:3px;box-shadow:0 0 30px rgba(255,215,0,0.4);font-family:'Orbitron',sans-serif;opacity:1;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 20px rgba(255,215,0,0.4)}50%{box-shadow:0 0 40px rgba(255,215,0,0.8),0 0 60px rgba(229,57,53,0.4)}}
 .intro-helmet{font-size:60px;margin-bottom:10px;filter:drop-shadow(0 0 20px rgba(255,215,0,0.5))}
 .intro-flag-big{font-size:70px;margin-bottom:5px;filter:drop-shadow(0 0 15px rgba(0,100,0,0.5))}
@@ -132,7 +132,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Arial,sa
 <div class="intro-dot" data-slide="3"></div>
 <div class="intro-dot" data-slide="4"></div>
 </div>
-<button id="intro-start-btn">INICIAR CORRIDA</button>
+<button id="intro-start-btn" onclick="window._launchFromIntro&&window._launchFromIntro()">INICIAR CORRIDA</button>
 </div>
 
 <div id="header">
@@ -170,7 +170,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Arial,sa
 <div id="start-screen">
 <h2>&#127463;&#127479; SENNA TETRIS &#127463;&#127479;</h2>
 <div class="subtitle">Complete linhas para acelerar!<br>Cada nivel e uma fase da carreira do Senna.</div>
-<button id="start-btn">LARGAR!</button>
+<button id="start-btn" onclick="window._startGame&&window._startGame()">LARGAR!</button>
 <div class="senna-quote">"Se voce nao vai com tudo, por que iria?"<br>- Ayrton Senna</div>
 </div>
 <div id="game-over-screen">
@@ -178,7 +178,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Arial,sa
 <div class="final-score" id="final-score">0</div>
 <div style="color:#aaa;font-size:12px;font-family:'Orbitron',sans-serif">Pontuacao Final</div>
 <div id="game-over-level" style="color:#FFD700;font-size:11px;margin-top:5px;font-family:'Orbitron',sans-serif"></div>
-<button id="restart-btn">NOVA CORRIDA</button>
+<button id="restart-btn" onclick="window._startGame&&window._startGame()">NOVA CORRIDA</button>
 </div>
 </div>
 <script>
@@ -252,7 +252,7 @@ document.querySelectorAll('.intro-dot').forEach(d=>{
   });
 });
 
-function launchFromIntro(){
+window._launchFromIntro=function(){
   clearInterval(introAutoTimer);
   introScreen.style.opacity='0';
   introScreen.style.transition='opacity 0.8s';
@@ -262,15 +262,15 @@ function launchFromIntro(){
   },800);
   initAudio();
   playF1Sound('engine');
-}
-let introFired=false;
-introBtn.addEventListener('touchstart',e=>{
-  e.preventDefault();e.stopPropagation();
-  if(!introFired){introFired=true;launchFromIntro()}
-},{passive:false});
-introBtn.addEventListener('click',e=>{
-  e.preventDefault();e.stopPropagation();
-  if(!introFired){introFired=true;launchFromIntro()}
+};
+
+// Also allow tapping slides to advance, and skip intro by tapping the last slide
+document.querySelectorAll('.intro-slide').forEach(s=>{
+  s.addEventListener('click',()=>{
+    clearInterval(introAutoTimer);
+    if(currentSlide<totalSlides-1)showSlide(currentSlide+1);
+    else window._launchFromIntro&&window._launchFromIntro();
+  });
 });
 
 startIntroAuto();
@@ -747,21 +747,8 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-// Start / Restart - use touchstart for immediate response on mobile
-function attachStartHandler(id,fn){
-  const el=document.getElementById(id);
-  let fired=false;
-  el.addEventListener('touchstart',e=>{
-    e.preventDefault();e.stopPropagation();
-    if(!fired){fired=true;fn();setTimeout(()=>fired=false,500)}
-  },{passive:false});
-  el.addEventListener('click',e=>{
-    e.preventDefault();e.stopPropagation();
-    if(!fired){fired=true;fn();setTimeout(()=>fired=false,500)}
-  });
-}
-attachStartHandler('start-btn',startGame);
-attachStartHandler('restart-btn',startGame);
+// Expose startGame globally for onclick handlers
+window._startGame=startGame;
 
 setTimeout(resize,100);
 })();
