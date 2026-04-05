@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Tese — Bruno Abige · BdaPowered</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=Lora:ital,wght@0,400;1,400;1,500&display=swap');
+
+:root {
+  --papel: #F5F0E8;
+  --papel-escuro: #EDE7D9;
+  --tinta: #1A1814;
+  --tinta-fraca: #6B6459;
+  --tinta-muito-fraca: #A09890;
+  --ouro: #8B6914;
+  --ouro-claro: #C9A84C;
+  --acento: #2C4A7C;
+  --acento-claro: #4A7CB8;
+  --linha: rgba(26,24,20,0.12);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: 'Lora', serif;
+  line-height: 1.7;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23paper)' opacity='0.06'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.8;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: repeating-linear-gradient(transparent, transparent 27px, rgba(26,24,20,0.04) 27px, rgba(26,24,20,0.04) 28px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.margem {
+  position: fixed;
+  left: 72px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(180,60,60,0.15);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.pagina {
+  position: relative;
+  z-index: 2;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 80px 48px 120px 96px;
+}
+
+.doc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 64px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--linha);
+}
+
+.doc-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--tinta-muito-fraca);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  line-height: 1.8;
+}
+
+.doc-numero {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--tinta-muito-fraca);
+  letter-spacing: 0.1em;
+  text-align: right;
+}
+
+.abertura {
+  margin-bottom: 80px;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: surgir 1.2s ease 0.3s forwards;
+}
+
+@keyframes surgir {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.abertura-data {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--tinta-muito-fraca);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.abertura-data::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 1px;
+  background: var(--tinta-muito-fraca);
+}
+
+.titulo-principal {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(42px, 7vw, 80px);
+  font-weight: 900;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+  color: var(--tinta);
+}
+
+.titulo-italico {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(42px, 7vw, 80px);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  margin-bottom: 48px;
+  color: var(--ouro);
+}
+
+.frase-abertura {
+  font-family: 'Lora', serif;
+  font-size: 20px;
+  font-style: italic;
+  color: var(--tinta-fraca);
+  line-height: 1.8;
+  max-width: 560px;
+  border-left: 2px solid var(--ouro-claro);
+  padding-left: 24px;
+  margin-bottom: 48px;
+}
+
+.paragrafo {
+  font-size: 17px;
+  color: var(--tinta);
+  line-height: 1.85;
+  margin-bottom: 24px;
+  max-width: 620px;
+}
+
+.paragrafo em { font-style: italic; color: var(--ouro); }
+.paragrafo strong { font-weight: 700; color: var(--tinta); }
+
+.divisor {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 56px 0;
+  color: var(--tinta-muito-fraca);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.divisor::before, .divisor::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--linha);
+}
+
+.timeline-section { margin-bottom: 80px; }
+
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--tinta-muito-fraca);
+  margin-bottom: 40px;
+}
+
+.tl-item {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 32px;
+  margin-bottom: 48px;
+  opacity: 0;
+  transform: translateX(-12px);
+  transition: all 0.7s ease;
+  position: relative;
+}
+
+.tl-item.visivel { opacity: 1; transform: translateX(0); }
+
+.tl-item::before {
+  content: '';
+  position: absolute;
+  left: 80px;
+  top: 8px;
+  bottom: -48px;
+  width: 1px;
+  background: var(--linha);
+}
+
+.tl-item:last-child::before { display: none; }
+
+.tl-ano {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--tinta-muito-fraca);
+  letter-spacing: 0.1em;
+  padding-top: 4px;
+  text-align: right;
+}
+
+.tl-corpo {
+  padding-left: 24px;
+  position: relative;
+}
+
+.tl-corpo::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 8px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ouro);
+  background: var(--papel);
+}
+
+.tl-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--tinta);
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.tl-subtitulo {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--ouro);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.tl-texto {
+  font-size: 15px;
+  color: var(--tinta-fraca);
+  line-height: 1.7;
+  max-width: 480px;
+}
+
+.tl-item.futuro .tl-corpo::before { border-color: var(--acento); border-style: dashed; }
+.tl-item.futuro .tl-titulo { color: var(--acento); }
+.tl-item.futuro .tl-subtitulo { color: var(--acento-claro); }
+
+.evidencia {
+  background: var(--papel-escuro);
+  border: 1px solid var(--linha);
+  border-left: 3px solid var(--ouro-claro);
+  padding: 28px 32px;
+  margin: 40px 0;
+}
+
+.evidencia-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ouro);
+  margin-bottom: 12px;
+}
+
+.evidencia-texto {
+  font-family: 'Lora', serif;
+  font-size: 16px;
+  font-style: italic;
+  color: var(--tinta-fraca);
+  line-height: 1.7;
+}
+
+.evidencia-data {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--tinta-muito-fraca);
+  margin-top: 12px;
+  letter-spacing: 0.1em;
+}
+
+.movimentos { margin: 80px 0; }
+
+.movimento {
+  margin-bottom: 56px;
+  padding-bottom: 56px;
+  border-bottom: 1px solid var(--linha);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: all 0.7s ease;
+}
+
+.movimento:last-child { border-bottom: none; }
+.movimento.visivel { opacity: 1; transform: translateY(0); }
+
+.mov-numero {
+  font-family: 'Playfair Display', serif;
+  font-size: 72px;
+  font-weight: 900;
+  color: rgba(26,24,20,0.06);
+  line-height: 1;
+  margin-bottom: -20px;
+  letter-spacing: -0.04em;
+}
+
+.mov-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--tinta);
+  margin-bottom: 4px;
+}
+
+.mov-periodo {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--ouro);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.mov-texto { font-size: 16px; color: var(--tinta-fraca); line-height: 1.8; max-width: 540px; }
+.mov-texto em { color: var(--ouro); font-style: italic; }
+.mov-texto strong { color: var(--tinta); font-weight: 700; }
+
+.mov-dimensoes { margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+.dim { background: var(--papel-escuro); border: 1px solid var(--linha); padding: 16px; }
+
+.dim-nome {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--tinta-muito-fraca);
+  margin-bottom: 6px;
+}
+
+.dim-desc { font-size: 13px; color: var(--tinta-fraca); line-height: 1.5; }
+
+.equacao-section {
+  background: var(--tinta);
+  color: var(--papel);
+  padding: 56px 48px;
+  margin: 64px -48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.equacao-section::before {
+  content: '60"';
+  position: absolute;
+  right: -20px;
+  top: -40px;
+  font-family: 'Playfair Display', serif;
+  font-size: 200px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.03);
+  pointer-events: none;
+  line-height: 1;
+}
+
+.eq-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ouro-claro);
+  margin-bottom: 24px;
+}
+
+.eq-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px, 4vw, 44px);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 24px;
+  color: var(--papel);
+}
+
+.eq-titulo em { font-style: italic; color: var(--ouro-claro); }
+
+.eq-texto { font-size: 15px; color: rgba(245,240,232,0.7); line-height: 1.8; max-width: 520px; margin-bottom: 32px; }
+
+.eq-numeros {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.eq-num { border-left: 1px solid rgba(201,168,76,0.3); padding-left: 16px; }
+
+.eq-num-valor {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--ouro-claro);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.eq-num-desc {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: rgba(245,240,232,0.5);
+  letter-spacing: 0.1em;
+  line-height: 1.4;
+}
+
+.sobre { margin: 80px 0 40px; }
+
+.sobre-nome {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--tinta);
+  margin-bottom: 4px;
+}
+
+.sobre-cargo {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--ouro);
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.sobre-texto { font-size: 16px; color: var(--tinta-fraca); line-height: 1.8; max-width: 540px; }
+
+.trilha-nav {
+  position: fixed;
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 100;
+}
+
+.trilha-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1px solid var(--tinta-muito-fraca);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.trilha-dot.ativo { background: var(--ouro); border-color: var(--ouro); }
+
+footer {
+  margin-top: 80px;
+  padding-top: 24px;
+  border-top: 1px solid var(--linha);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-marca { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--tinta); }
+.footer-marca span { color: var(--ouro); }
+
+.footer-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--tinta-muito-fraca);
+  letter-spacing: 0.15em;
+  text-align: right;
+  line-height: 1.8;
+}
+
+.stamp {
+  display: inline-block;
+  border: 2px solid var(--ouro);
+  color: var(--ouro);
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  transform: rotate(-2deg);
+  margin-top: 16px;
+}
+
+.fade-section {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.fade-section.visivel { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 640px) {
+  .pagina { padding: 48px 24px 80px 40px; }
+  .margem { left: 28px; }
+  .equacao-section { margin: 48px -24px; padding: 40px 28px; }
+  .mov-dimensoes { grid-template-columns: 1fr; }
+  .eq-numeros { grid-template-columns: 1fr; gap: 16px; }
+  .trilha-nav { display: none; }
+  .doc-header { flex-direction: column; gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<div class="margem"></div>
+
+<nav class="trilha-nav" aria-label="Navegação da trilha">
+  <div class="trilha-dot ativo" data-section="abertura" title="Abertura"></div>
+  <div class="trilha-dot" data-section="historia" title="A História"></div>
+  <div class="trilha-dot" data-section="movimentos" title="Os 3 Movimentos"></div>
+  <div class="trilha-dot" data-section="equacao" title="A Equação"></div>
+  <div class="trilha-dot" data-section="sobre" title="Sobre"></div>
+</nav>
+
+<main class="pagina">
+
+  <header class="doc-header">
+    <div class="doc-meta">
+      BdaPowered · Research<br>
+      Documento aberto · v1.0<br>
+      Abril de 2026
+    </div>
+    <div class="doc-numero">
+      Tese #001<br>
+      <span style="color: var(--ouro); font-size: 9px;">privado → público</span>
+    </div>
+  </header>
+
+  <section class="abertura" id="abertura">
+    <div class="abertura-data">Novembro de 2023</div>
+
+    <div class="titulo-principal">Eu vi algo.</div>
+    <div class="titulo-italico">Não sabia nomear.</div>
+
+    <p class="frase-abertura">
+      "Era uma esteira. Cada ciclo durava 60 segundos.
+      Quando eu enviava, retornava uma barra de ouro.
+      Não era sobre dinheiro. Era sobre o valor do tempo
+      bem aproveitado aprendendo com quem já havia chegado lá."
+    </p>
+
+    <p class="paragrafo">
+      Em 2023 eu observava um empresário que admiro —
+      mais velho que eu, como um irmão mais velho.
+      Tentava aprender tudo que podia enquanto havia tempo.
+      Sabia que aquele tempo tinha que ser aproveitado
+      como uma escola. Ele nunca respondeu minha mensagem.
+      Mas o que aprendi observando ficou.
+    </p>
+
+    <p class="paragrafo">
+      Os gregos tinham duas palavras para tempo.
+      <em>Chronos</em> — o relógio, os segundos, a esteira.
+      <em>Kairós</em> — o momento certo, a janela que se abre,
+      a hora em que os movimentos fazem sentido.
+      Passei 3 anos tentando alinhar os dois.
+      Quando alinharam, os movimentos vieram.
+    </p>
+
+    <p class="paragrafo">
+      O que você vai ler aqui não começou com AI.
+      Começou com essa imagem — a esteira, os 60 segundos,
+      a barra de ouro. A AI é o que tornou essa visão
+      tecnicamente possível em escala.
+      Mas a visão existia antes de ter nome.
+    </p>
+
+    <div class="stamp">Documento original preservado</div>
+  </section>
+
+  <div class="divisor">A história</div>
+
+  <section class="timeline-section" id="historia">
+    <div class="section-label">// Linha do tempo — o que realmente aconteceu</div>
+
+    <div class="timeline">
+
+      <div class="tl-item" id="tl-2023">
+        <div class="tl-ano">2023</div>
+        <div class="tl-corpo">
+          <div class="tl-subtitulo">Intuição bruta</div>
+          <div class="tl-titulo">O sketch de dezembro</div>
+          <div class="tl-texto">
+            Franquias. Hologramas. Executivos em caixas de realidade aumentada.
+            Um sketch datado 02/12/23, assinado @brunoabige.
+            Não era tecnologia — era a mesma pergunta com outro vocabulário:
+            <em style="color: var(--ouro);">como repetir valor de forma estruturada?</em>
+            <br><br>
+            No final desse ano, um vídeo de um empresário. Uma inspiração. Um sonho anotado no Google Keep.
+            A nota foi perdida. A ideia não.
+          </div>
+          <div class="evidencia">
+            <div class="evidencia-label">// Documento físico original</div>
+            <div class="evidencia-texto">
+              "Acionamentos &amp; Mecanismos. Projeção — Alcance. Produtos · Serviços · Marcas. Novo negócio. Identidade visual."
+            </div>
+            <div class="evidencia-data">Sketch manuscrito · @brunoabige · 02/12/2023</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item" id="tl-2024">
+        <div class="tl-ano">2024</div>
+        <div class="tl-corpo">
+          <div class="tl-subtitulo">Primeiro registro estruturado</div>
+          <div class="tl-titulo">O papelão às 23h30</div>
+          <div class="tl-texto">
+            06 de novembro de 2024. 23h30. Um papelão grande. Caneta.
+            Três pilares desenhados à mão: Cognição, Percepção, Comunicação.
+            Uma linha do tempo de 2025 a 2031 com pontos coloridos.
+            No topo: <em style="color: var(--ouro);">"novas ações, novo modo de pensar."</em>
+            <br><br>
+            Era grande demais para continuar só na cabeça.
+            O IOCP ganhava forma. O Educare emergia.
+            A visão de 70 anos aparecia pela primeira vez em papel.
+          </div>
+          <div class="evidencia">
+            <div class="evidencia-label">// Registro físico datado</div>
+            <div class="evidencia-texto">
+              "IOCP · Educare · Fundamentos. Cognição → Percepção → Comunicação.
+              Growth. Infinito Positivo. Evolução: 2025 · 2026 · 2027 · 2028 · 2029 · 2030 · 2031 →"
+            </div>
+            <div class="evidencia-data">Papelão manuscrito · By Bruno Abige · 06/11/2024 · 23h30</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item" id="tl-2025">
+        <div class="tl-ano">2025</div>
+        <div class="tl-corpo">
+          <div class="tl-subtitulo">Execução</div>
+          <div class="tl-titulo">O ecossistema ganha nome</div>
+          <div class="tl-texto">
+            IOCP Mobile. Educare. Nexxus. BDA Agent Force.
+            Cada produto é uma instância da mesma tese sendo testada em campo.
+            O vocabulário finalmente encontra a intuição:
+            <em style="color: var(--ouro);">agentes, recorrência, repetição de valor.</em>
+            <br><br>
+            40.000 instâncias Protheus no Brasil.
+            Uma plataforma sendo construída para servir esse mercado
+            antes que ele saiba que precisa.
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item futuro" id="tl-2026">
+        <div class="tl-ano">2026</div>
+        <div class="tl-corpo">
+          <div class="tl-subtitulo">Formalização · Agora</div>
+          <div class="tl-titulo">A tese é escrita</div>
+          <div class="tl-texto">
+            Este documento. Esta trilha.
+            Não para declarar vitória — para registrar o percurso
+            enquanto ele ainda está acontecendo.
+            <br><br>
+            A janela de 2027–2028 está aberta.
+            O que for construído agora vai definir o que será colhido lá.
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item futuro" id="tl-2028">
+        <div class="tl-ano">2027–28</div>
+        <div class="tl-corpo">
+          <div class="tl-subtitulo">Projeção</div>
+          <div class="tl-titulo">O mercado chega</div>
+          <div class="tl-texto">
+            Quando agentes AI autônomos passarem a executar trabalho que hoje leva semanas,
+            as soluções construídas entre 2024 e 2026 já estarão consolidadas.
+            O custo de entrada será 10× maior.
+            A diferenciação será impossível de replicar rapidamente.
+            <br><br>
+            <em style="color: var(--acento);">Quem entendeu antes, chegou primeiro.</em>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divisor">Os 3 movimentos</div>
+
+  <section class="movimentos" id="movimentos">
+    <div class="section-label">// A régua — onde você está</div>
+
+    <div class="movimento" id="mov1">
+      <div class="mov-numero">01</div>
+      <div class="mov-titulo">Reconhecimento</div>
+      <div class="mov-periodo">2022 → 2024 · Janela fechando</div>
+      <div class="mov-texto">
+        Você vê o padrão antes do mercado nomear. A maioria ainda pergunta
+        <em>"isso vai durar?"</em> enquanto você já está perguntando
+        <em>"como estruturo as repetições?"</em>
+        <br><br>
+        Não é genialidade. É atenção sustentada a um sinal fraco
+        que a maioria filtra como ruído.
+      </div>
+      <div class="mov-dimensoes">
+        <div class="dim">
+          <div class="dim-nome">Horizontal</div>
+          <div class="dim-desc">Mesma solução, mais clientes. Alavanca: distribuição.</div>
+        </div>
+        <div class="dim">
+          <div class="dim-nome">Vertical</div>
+          <div class="dim-desc">Mais profundidade por cliente. Alavanca: especialização.</div>
+        </div>
+        <div class="dim">
+          <div class="dim-nome">Temporal</div>
+          <div class="dim-desc">Mesmo cliente, mês após mês. Alavanca: recorrência.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="movimento" id="mov2">
+      <div class="mov-numero">02</div>
+      <div class="mov-titulo">Posicionamento</div>
+      <div class="mov-periodo">2024 → 2027 · Janela aberta agora</div>
+      <div class="mov-texto">
+        A janela do posicionamento é a mais valiosa — e a mais mal aproveitada.
+        É quando o mercado ainda não chegou, mas os primeiros sinais já são inegáveis.
+        <br><br>
+        Construir agora significa chegar consolidado quando a demanda explodir.
+        <strong>O custo de construção nunca será tão baixo. O valor nunca será tão alto depois.</strong>
+      </div>
+    </div>
+
+    <div class="movimento" id="mov3">
+      <div class="mov-numero">03</div>
+      <div class="mov-titulo">Captura</div>
+      <div class="mov-periodo">2027 → 2031 · Colheita</div>
+      <div class="mov-texto">
+        O que foi plantado nos movimentos 01 e 02 começa a gerar retorno.
+        Não como golpe único — como <em>esteira</em>:
+        recorrência, escala, repetição de valor.
+        <br><br>
+        A barra de ouro não é metafórica. É o que uma operação de 60 segundos
+        bem posicionada gera, em escala, mês após mês.
+      </div>
+    </div>
+
+  </section>
+
+  <section class="equacao-section" id="equacao">
+    <div class="eq-label">// A equação central</div>
+    <div class="eq-titulo">
+      60 segundos de AI<br>
+      <em>= 1 barra de ouro?</em>
+    </div>
+    <p class="eq-texto">
+      Não em custo bruto — em valor gerado. Uma operação de agente AI de 60 segundos
+      que substitui 40h de trabalho especializado já supera o valor de uma barra de ouro
+      quando aplicada em escala enterprise. O cruzamento individual: 2027–2028.
+    </p>
+    <div class="eq-numeros">
+      <div class="eq-num">
+        <div class="eq-num-valor">300×</div>
+        <div class="eq-num-desc">queda de custo compute<br>Nov/23 → Abr/26</div>
+      </div>
+      <div class="eq-num">
+        <div class="eq-num-valor">$1,87M</div>
+        <div class="eq-num-desc">valor barra ouro 400oz<br>Abril de 2026</div>
+      </div>
+      <div class="eq-num">
+        <div class="eq-num-valor">2027</div>
+        <div class="eq-num-desc">cruzamento projetado<br>operação individual</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sobre fade-section" id="sobre">
+    <div class="sobre-nome">Bruno Abige</div>
+    <div class="sobre-cargo">Head of Innovation · BdaPowered · Ecossistema TOTVS/Protheus</div>
+    <p class="sobre-texto">
+      Esta tese começou como uma observação. Virou um sketch. Virou um papelão.
+      Virou um ecossistema. Virou este documento.
+      <br><br>
+      Não é sobre AI. É sobre timing, arquitetura de recorrência,
+      e a convicção de construir quando o custo está baixo e a demanda ainda não chegou.
+    </p>
+    <a href="ai-gold-60s.html" style="display:inline-block; margin-top:24px; font-family:'DM Mono',monospace; font-size:11px; color:var(--ouro); letter-spacing:0.2em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid var(--ouro); padding-bottom:2px;">
+      Ver: AI × Ouro × 60 Segundos →
+    </a>
+  </section>
+
+  <footer>
+    <div class="footer-marca">Bda<span>Powered</span></div>
+    <div class="footer-meta">
+      Tese #001 · v1.0<br>
+      Abril de 2026 · Documento aberto
+    </div>
+  </footer>
+
+</main>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visivel');
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.tl-item, .movimento, .fade-section').forEach(el => observer.observe(el));
+
+const dots = document.querySelectorAll('.trilha-dot');
+const sections = ['abertura', 'historia', 'movimentos', 'equacao', 'sobre'];
+
+const sectionObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const idx = sections.indexOf(entry.target.id);
+      dots.forEach((d, i) => d.classList.toggle('ativo', i === idx));
+    }
+  });
+}, { threshold: 0.3 });
+
+sections.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) sectionObserver.observe(el);
+});
+</script>
+
+</body>
+</html>
