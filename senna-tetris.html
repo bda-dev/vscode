@@ -11,7 +11,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Arial,sa
 #game-container{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;position:relative;overflow:hidden}
 #bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0}
 #overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(180deg,rgba(0,0,0,0.3)0%,rgba(0,0,0,0.6)100%);z-index:1}
-#particle-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;pointer-events:none}
+#particle-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;pointer-events:none;touch-action:none}
 #header{position:relative;z-index:10;width:100%;display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:linear-gradient(90deg,rgba(0,100,0,0.85),rgba(255,204,0,0.85),rgba(0,56,168,0.85));border-bottom:2px solid #FFD700}
 #header h1{font-size:14px;color:#fff;text-shadow:1px 1px 3px #000;letter-spacing:2px;font-family:'Orbitron','Racing Sans One',sans-serif}
 .header-flag{font-size:18px}
@@ -252,7 +252,7 @@ document.querySelectorAll('.intro-dot').forEach(d=>{
   });
 });
 
-introBtn.addEventListener('click',()=>{
+function launchFromIntro(){
   clearInterval(introAutoTimer);
   introScreen.style.opacity='0';
   introScreen.style.transition='opacity 0.8s';
@@ -262,6 +262,15 @@ introBtn.addEventListener('click',()=>{
   },800);
   initAudio();
   playF1Sound('engine');
+}
+let introFired=false;
+introBtn.addEventListener('touchstart',e=>{
+  e.preventDefault();e.stopPropagation();
+  if(!introFired){introFired=true;launchFromIntro()}
+},{passive:false});
+introBtn.addEventListener('click',e=>{
+  e.preventDefault();e.stopPropagation();
+  if(!introFired){introFired=true;launchFromIntro()}
 });
 
 startIntroAuto();
@@ -738,11 +747,21 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-// Start / Restart
-document.getElementById('start-btn').addEventListener('click',startGame);
-document.getElementById('start-btn').addEventListener('touchend',e=>{e.preventDefault();startGame()});
-document.getElementById('restart-btn').addEventListener('click',startGame);
-document.getElementById('restart-btn').addEventListener('touchend',e=>{e.preventDefault();startGame()});
+// Start / Restart - use touchstart for immediate response on mobile
+function attachStartHandler(id,fn){
+  const el=document.getElementById(id);
+  let fired=false;
+  el.addEventListener('touchstart',e=>{
+    e.preventDefault();e.stopPropagation();
+    if(!fired){fired=true;fn();setTimeout(()=>fired=false,500)}
+  },{passive:false});
+  el.addEventListener('click',e=>{
+    e.preventDefault();e.stopPropagation();
+    if(!fired){fired=true;fn();setTimeout(()=>fired=false,500)}
+  });
+}
+attachStartHandler('start-btn',startGame);
+attachStartHandler('restart-btn',startGame);
 
 setTimeout(resize,100);
 })();
