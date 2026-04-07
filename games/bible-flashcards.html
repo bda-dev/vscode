@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards Bíblicos</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 50%, #0a0a1a 100%);
+  font-family: 'Georgia', serif;
+  color: #e8e0ff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+header {
+  text-align: center;
+  padding: 24px 16px 12px;
+}
+
+header h1 {
+  font-size: 2rem;
+  color: #c0a8ff;
+  text-shadow: 0 2px 12px #6040ff88;
+  letter-spacing: 2px;
+}
+
+header p { font-size: 0.95rem; color: #8878bb; margin-top: 4px; }
+
+.filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 10px 16px 4px;
+}
+
+.btn {
+  padding: 8px 18px;
+  border: 2px solid #6040bb;
+  border-radius: 8px;
+  background: transparent;
+  color: #c0a8ff;
+  font-family: 'Georgia', serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.btn:hover { background: #6040bb22; }
+.btn.active { background: #6040bb; color: #fff; font-weight: bold; }
+.btn.learned-btn { border-color: #40bb80; color: #80ffb8; }
+.btn.learned-btn:hover { background: #40bb8022; }
+.btn.learned-btn.marked { background: #40bb80; color: #000; font-weight: bold; }
+
+.progress-bar-wrap {
+  width: 90%;
+  max-width: 640px;
+  background: #1a1a3a;
+  border-radius: 8px;
+  height: 8px;
+  margin: 10px 0 4px;
+  overflow: hidden;
+  border: 1px solid #3030608a;
+}
+
+.progress-bar { height: 100%; background: #6040bb; transition: width .4s; border-radius: 8px; }
+
+.progress-label {
+  font-size: 0.8rem;
+  color: #8878bb;
+  margin-bottom: 8px;
+}
+
+/* Card */
+.card-area {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 16px;
+}
+
+.nav-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid #6040bb;
+  background: transparent;
+  color: #c0a8ff;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: all .2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nav-btn:hover { background: #6040bb44; }
+.nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+.card-scene {
+  width: 540px;
+  max-width: calc(100vw - 120px);
+  height: 300px;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.card-body {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform .5s cubic-bezier(.4,0,.2,1);
+  border-radius: 18px;
+}
+
+.card-body.flipped { transform: rotateY(180deg); }
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 24px;
+  text-align: center;
+  box-shadow: 0 8px 32px #0008;
+}
+
+/* Front - book name */
+.card-front {
+  background: linear-gradient(145deg, #1a1040, #2d1a70);
+  border: 2px solid #7060c0;
+}
+
+.card-front .book-num {
+  font-size: 0.7rem;
+  color: #8878bb;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.card-front .book-name {
+  font-size: 2rem;
+  color: #c0a8ff;
+  font-weight: bold;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.card-front .testament-badge {
+  font-size: 0.7rem;
+  padding: 3px 10px;
+  border-radius: 12px;
+  margin-top: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.badge-at { background: #3a2800; color: #f0c040; border: 1px solid #c9a96e; }
+.badge-nt { background: #001a3a; color: #60a8ff; border: 1px solid #4080c0; }
+
+.card-front .hint { font-size: 0.75rem; color: #6060aa; margin-top: 20px; }
+
+/* Back - key verse */
+.card-back {
+  background: linear-gradient(145deg, #0a1a08, #1a3a18);
+  border: 2px solid #40bb80;
+  transform: rotateY(180deg);
+}
+
+.card-back .verse-ref {
+  font-size: 0.85rem;
+  color: #80ffb8;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  font-weight: bold;
+}
+
+.card-back .verse-text {
+  font-size: 1.05rem;
+  color: #d0f0d8;
+  line-height: 1.7;
+  font-style: italic;
+}
+
+.card-back .book-back-name {
+  font-size: 0.7rem;
+  color: #60aa80;
+  margin-top: 14px;
+  letter-spacing: 1px;
+}
+
+/* Learned indicator */
+.card-face.learned-glow {
+  box-shadow: 0 0 24px #40bb8055, 0 8px 32px #0008;
+}
+
+/* Counter */
+.card-counter {
+  font-size: 0.85rem;
+  color: #8878bb;
+  margin-top: 8px;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 8px 16px 16px;
+}
+
+/* Keyboard hint */
+.kb-hint {
+  font-size: 0.72rem;
+  color: #5050888a;
+  padding-bottom: 24px;
+}
+
+kbd {
+  border: 1px solid #5050884a;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: monospace;
+  background: #ffffff09;
+}
+
+@media (max-width: 520px) {
+  .card-scene { height: 260px; }
+  .card-front .book-name { font-size: 1.5rem; }
+  .card-back .verse-text { font-size: 0.92rem; }
+  header h1 { font-size: 1.4rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>✦ Flashcards Bíblicos ✦</h1>
+  <p>Livros da Bíblia e seus versículos-chave</p>
+</header>
+
+<div class="filters">
+  <button class="btn active" id="f-all" onclick="setFilter('all')">Todos (66)</button>
+  <button class="btn" id="f-at"  onclick="setFilter('AT')">Antigo Testamento (39)</button>
+  <button class="btn" id="f-nt"  onclick="setFilter('NT')">Novo Testamento (27)</button>
+  <button class="btn" id="f-learned" onclick="setFilter('learned')">Aprendidos</button>
+  <button class="btn" onclick="shuffleCards()">🔀 Embaralhar</button>
+  <button class="btn" onclick="resetLearned()">↺ Resetar</button>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="progress-bar" id="prog-bar"></div>
+</div>
+<div class="progress-label" id="prog-label">0 / 66 aprendidos</div>
+
+<div class="card-area">
+  <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592;</button>
+  <div class="card-scene" onclick="flipCard()">
+    <div class="card-body" id="card-body">
+      <div class="card-face card-front" id="card-front">
+        <div class="book-num" id="book-num"></div>
+        <div class="book-name" id="book-name"></div>
+        <span class="testament-badge" id="test-badge"></span>
+        <div class="hint">Clique para ver o versículo</div>
+      </div>
+      <div class="card-face card-back" id="card-back">
+        <div class="verse-ref" id="verse-ref"></div>
+        <div class="verse-text" id="verse-text"></div>
+        <div class="book-back-name" id="book-back-name"></div>
+      </div>
+    </div>
+  </div>
+  <button class="nav-btn" id="next-btn" onclick="navigate(1)">&#8594;</button>
+</div>
+
+<div class="card-counter" id="card-counter">1 / 66</div>
+
+<div class="actions">
+  <button class="btn learned-btn" id="learn-btn" onclick="toggleLearned()">✓ Marcar como aprendido</button>
+</div>
+
+<div class="kb-hint">
+  <kbd>←</kbd> anterior &nbsp; <kbd>→</kbd> próximo &nbsp; <kbd>Espaço</kbd> virar
+</div>
+
+<script>
+const BOOKS = [
+  // ANTIGO TESTAMENTO
+  {n:'Gênesis',       t:'AT', ref:'Gênesis 1:1',         verse:'No princípio, criou Deus os céus e a terra.'},
+  {n:'Êxodo',         t:'AT', ref:'Êxodo 20:2',          verse:'Eu sou o SENHOR teu Deus, que te tirei da terra do Egito, da casa da servidão.'},
+  {n:'Levítico',      t:'AT', ref:'Levítico 19:2',        verse:'Santos sereis, porque eu, o SENHOR vosso Deus, sou santo.'},
+  {n:'Números',       t:'AT', ref:'Números 6:24-26',      verse:'O SENHOR te abençoe e te guarde; o SENHOR faça resplandecer o seu rosto sobre ti.'},
+  {n:'Deuteronômio',  t:'AT', ref:'Deuteronômio 6:5',     verse:'Amarás o SENHOR teu Deus de todo o teu coração, de toda a tua alma e de todas as tuas forças.'},
+  {n:'Josué',         t:'AT', ref:'Josué 1:9',            verse:'Sê forte e corajoso! Não te atemorizes nem te desanimes, porque o SENHOR, teu Deus, estará contigo.'},
+  {n:'Juízes',        t:'AT', ref:'Juízes 21:25',         verse:'Naqueles dias não havia rei em Israel; cada um fazia o que parecia reto aos seus olhos.'},
+  {n:'Rute',          t:'AT', ref:'Rute 1:16',            verse:'Para onde quer que tu fores, irei eu; onde quer que te aposentares, me aposentarei.'},
+  {n:'1 Samuel',      t:'AT', ref:'1 Samuel 16:7',        verse:'O homem olha para a aparência, mas o SENHOR olha para o coração.'},
+  {n:'2 Samuel',      t:'AT', ref:'2 Samuel 7:16',        verse:'A tua casa e o teu reino serão estáveis para sempre diante de mim; o teu trono será estabelecido para sempre.'},
+  {n:'1 Reis',        t:'AT', ref:'1 Reis 18:21',         verse:'Até quando claudicareis entre dois pensamentos? Se o SENHOR é Deus, segui-o; se Baal, segui-o a ele.'},
+  {n:'2 Reis',        t:'AT', ref:'2 Reis 2:11',          verse:'E Elias subiu ao céu num redemoinho.'},
+  {n:'1 Crônicas',    t:'AT', ref:'1 Crônicas 16:34',     verse:'Rendei graças ao SENHOR, porque ele é bom; porque a sua misericórdia dura para sempre.'},
+  {n:'2 Crônicas',    t:'AT', ref:'2 Crônicas 7:14',      verse:'Se o meu povo se humilhar, e orar, e buscar a minha face, e se converter dos seus maus caminhos, então eu ouvirei.'},
+  {n:'Esdras',        t:'AT', ref:'Esdras 7:10',          verse:'Esdras tinha dirigido o seu coração a estudar a lei do SENHOR e a cumpri-la.'},
+  {n:'Neemias',       t:'AT', ref:'Neemias 8:10',         verse:'A alegria do SENHOR é a vossa força.'},
+  {n:'Ester',         t:'AT', ref:'Ester 4:14',           verse:'Quem sabe se para uma ocasião como esta chegaste ao reino?'},
+  {n:'Jó',            t:'AT', ref:'Jó 19:25',             verse:'Eu sei que o meu Redentor vive, e que por fim se levantará sobre o pó.'},
+  {n:'Salmos',        t:'AT', ref:'Salmos 23:1',          verse:'O SENHOR é o meu pastor; nada me faltará.'},
+  {n:'Provérbios',    t:'AT', ref:'Provérbios 3:5-6',     verse:'Confia no SENHOR de todo o teu coração, e não te estribes no teu próprio entendimento.'},
+  {n:'Eclesiastes',   t:'AT', ref:'Eclesiastes 12:13',    verse:'Teme a Deus e guarda os seus mandamentos; porque isso é o dever de todo homem.'},
+  {n:'Cânticos',      t:'AT', ref:'Cânticos 8:6',         verse:'O amor é forte como a morte... as suas brasas são brasas de fogo, chama do SENHOR.'},
+  {n:'Isaías',        t:'AT', ref:'Isaías 40:31',         verse:'Os que esperam no SENHOR renovarão as suas forças; subirão com asas como águias.'},
+  {n:'Jeremias',      t:'AT', ref:'Jeremias 29:11',       verse:'Porque eu sei os pensamentos que tenho a vosso respeito — pensamentos de paz, e não de mal.'},
+  {n:'Lamentações',   t:'AT', ref:'Lamentações 3:22-23',  verse:'As misericórdias do SENHOR não têm fim; as suas compaixões não se esgotam; renovam-se cada manhã.'},
+  {n:'Ezequiel',      t:'AT', ref:'Ezequiel 36:26',       verse:'Dar-vos-ei coração novo, e porei dentro de vós espírito novo.'},
+  {n:'Daniel',        t:'AT', ref:'Daniel 3:17',          verse:'O nosso Deus a quem servimos pode livrar-nos da fornalha de fogo ardente.'},
+  {n:'Oséias',        t:'AT', ref:'Oséias 6:6',           verse:'Porque eu me agrado de misericórdia, e não de sacrifício; e do conhecimento de Deus.'},
+  {n:'Joel',          t:'AT', ref:'Joel 2:28',            verse:'Acontecerá depois que derramarei o meu Espírito sobre toda a carne.'},
+  {n:'Amós',          t:'AT', ref:'Amós 5:24',            verse:'Corra o juízo como as águas, e a justiça como ribeiro caudaloso.'},
+  {n:'Obadias',       t:'AT', ref:'Obadias 1:15',         verse:'Como tu fizeste, assim se fará a ti; a tua recompensa tornará sobre a tua cabeça.'},
+  {n:'Jonas',         t:'AT', ref:'Jonas 2:9',            verse:'A salvação pertence ao SENHOR.'},
+  {n:'Miqueias',      t:'AT', ref:'Miqueias 6:8',         verse:'Fazer justiça, amar a misericórdia e andar humildemente com o teu Deus.'},
+  {n:'Naum',          t:'AT', ref:'Naum 1:7',             verse:'O SENHOR é bom, uma força no dia da angústia, e conhece os que nele confiam.'},
+  {n:'Habacuque',     t:'AT', ref:'Habacuque 2:4',        verse:'O justo viverá pela sua fé.'},
+  {n:'Sofonias',      t:'AT', ref:'Sofonias 3:17',        verse:'O SENHOR teu Deus está no meio de ti, poderoso para salvar; alegrar-se-á sobre ti com júbilo.'},
+  {n:'Ageu',          t:'AT', ref:'Ageu 2:9',             verse:'A glória desta última casa será maior do que a da primeira.'},
+  {n:'Zacarias',      t:'AT', ref:'Zacarias 4:6',         verse:'Não por força, nem por vigor, mas pelo meu Espírito, diz o SENHOR dos Exércitos.'},
+  {n:'Malaquias',     t:'AT', ref:'Malaquias 3:10',       verse:'Trazei todos os dízimos à casa do tesouro... e provai-me nisto, diz o SENHOR.'},
+  // NOVO TESTAMENTO
+  {n:'Mateus',        t:'NT', ref:'Mateus 5:3',           verse:'Bem-aventurados os pobres de espírito, porque deles é o reino dos céus.'},
+  {n:'Marcos',        t:'NT', ref:'Marcos 1:15',          verse:'O reino de Deus está próximo; arrependei-vos e crede no evangelho.'},
+  {n:'Lucas',         t:'NT', ref:'Lucas 2:11',           verse:'Hoje vos nasceu o Salvador, que é Cristo, o Senhor, na cidade de Davi.'},
+  {n:'João',          t:'NT', ref:'João 3:16',            verse:'Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça.'},
+  {n:'Atos',          t:'NT', ref:'Atos 1:8',             verse:'Recebereis poder, ao descer sobre vós o Espírito Santo, e sereis minhas testemunhas.'},
+  {n:'Romanos',       t:'NT', ref:'Romanos 8:28',         verse:'Sabemos que todas as coisas cooperam para o bem daqueles que amam a Deus.'},
+  {n:'1 Coríntios',   t:'NT', ref:'1 Coríntios 13:13',   verse:'Agora, pois, permanecem a fé, a esperança e o amor, estes três; mas o maior destes é o amor.'},
+  {n:'2 Coríntios',   t:'NT', ref:'2 Coríntios 5:17',    verse:'Se alguém está em Cristo, é nova criatura; as coisas antigas já passaram.'},
+  {n:'Gálatas',       t:'NT', ref:'Gálatas 2:20',        verse:'Já estou crucificado com Cristo; e vivo, não mais eu, mas Cristo vive em mim.'},
+  {n:'Efésios',       t:'NT', ref:'Efésios 2:8',         verse:'Porque pela graça sois salvos, por meio da fé; e isso não vem de vós; é dom de Deus.'},
+  {n:'Filipenses',    t:'NT', ref:'Filipenses 4:13',     verse:'Posso tudo naquele que me fortalece.'},
+  {n:'Colossenses',   t:'NT', ref:'Colossenses 3:17',    verse:'E tudo quanto fizerdes, por palavra ou por obra, fazei-o em nome do Senhor Jesus.'},
+  {n:'1 Tessalonicenses', t:'NT', ref:'1 Tessalonicenses 5:18', verse:'Em tudo dai graças, porque esta é a vontade de Deus em Cristo Jesus para convosco.'},
+  {n:'2 Tessalonicenses', t:'NT', ref:'2 Tessalonicenses 3:3',  verse:'Mas o Senhor é fiel e vos confirmará e guardará do maligno.'},
+  {n:'1 Timóteo',     t:'NT', ref:'1 Timóteo 6:6',       verse:'E, na verdade, é grande ganho a piedade com contentamento.'},
+  {n:'2 Timóteo',     t:'NT', ref:'2 Timóteo 3:16',      verse:'Toda a Escritura é divinamente inspirada e proveitosa para ensinar, redargüir, corrigir e instruir em justiça.'},
+  {n:'Tito',          t:'NT', ref:'Tito 3:5',            verse:'Não por obras de justiça que houvéssemos feito, mas segundo a sua misericórdia, ele nos salvou.'},
+  {n:'Filemom',       t:'NT', ref:'Filemom 1:16',        verse:'Não já como escravo, mas como mais do que escravo, como irmão amado.'},
+  {n:'Hebreus',       t:'NT', ref:'Hebreus 11:1',        verse:'Ora, a fé é a certeza de coisas que se esperam e a convicção de coisas que não se veem.'},
+  {n:'Tiago',         t:'NT', ref:'Tiago 1:22',          verse:'Sede cumpridores da palavra, e não somente ouvintes, iludindo-vos a vós mesmos.'},
+  {n:'1 Pedro',       t:'NT', ref:'1 Pedro 5:7',         verse:'Lançando sobre ele toda a vossa ansiedade, porque ele tem cuidado de vós.'},
+  {n:'2 Pedro',       t:'NT', ref:'2 Pedro 3:9',         verse:'O Senhor não retarda a sua promessa... mas é longânimo para convosco.'},
+  {n:'1 João',        t:'NT', ref:'1 João 4:8',          verse:'Aquele que não ama não conhece a Deus, porque Deus é amor.'},
+  {n:'2 João',        t:'NT', ref:'2 João 1:6',          verse:'E este é o amor: que andemos segundo os seus mandamentos.'},
+  {n:'3 João',        t:'NT', ref:'3 João 1:4',          verse:'Não tenho maior alegria do que esta: ouvir que os meus filhos andam na verdade.'},
+  {n:'Judas',         t:'NT', ref:'Judas 1:3',           verse:'Combatais ardentemente pela fé que uma vez foi entregue aos santos.'},
+  {n:'Apocalipse',    t:'NT', ref:'Apocalipse 21:4',     verse:'E Deus limpará de seus olhos toda a lágrima, e não haverá mais morte.'},
+];
+
+let deck = [...BOOKS];
+let currentIndex = 0;
+let filter = 'all';
+let isFlipped = false;
+let learned = JSON.parse(localStorage.getItem('bible_learned') || '{}');
+
+function setFilter(f) {
+  filter = f;
+  ['all','at','nt','learned'].forEach(x => document.getElementById('f-'+x)?.classList.remove('active'));
+  document.getElementById('f-'+f.toLowerCase())?.classList.add('active');
+  applyFilter();
+}
+
+function applyFilter() {
+  if (filter === 'all') deck = [...BOOKS];
+  else if (filter === 'AT') deck = BOOKS.filter(b => b.t === 'AT');
+  else if (filter === 'NT') deck = BOOKS.filter(b => b.t === 'NT');
+  else if (filter === 'learned') deck = BOOKS.filter(b => learned[b.n]);
+  currentIndex = 0;
+  if (deck.length === 0) {
+    alert('Nenhum livro nesta categoria ainda!');
+    deck = [...BOOKS];
+    filter = 'all';
+    document.getElementById('f-all').classList.add('active');
+  }
+  showCard(false);
+  updateProgress();
+}
+
+function shuffleCards() {
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+  currentIndex = 0;
+  showCard(false);
+}
+
+function showCard(keepFlip) {
+  if (!keepFlip) {
+    isFlipped = false;
+    document.getElementById('card-body').classList.remove('flipped');
+  }
+  const b = deck[currentIndex];
+  const num = BOOKS.indexOf(b) + 1;
+  document.getElementById('book-num').textContent = `Livro ${num} de 66`;
+  document.getElementById('book-name').textContent = b.n;
+  const badge = document.getElementById('test-badge');
+  badge.textContent = b.t === 'AT' ? 'Antigo Testamento' : 'Novo Testamento';
+  badge.className = 'testament-badge ' + (b.t === 'AT' ? 'badge-at' : 'badge-nt');
+  document.getElementById('verse-ref').textContent = b.ref;
+  document.getElementById('verse-text').textContent = '"' + b.verse + '"';
+  document.getElementById('book-back-name').textContent = b.n;
+  document.getElementById('card-counter').textContent = `${currentIndex + 1} / ${deck.length}`;
+  document.getElementById('prev-btn').disabled = currentIndex === 0;
+  document.getElementById('next-btn').disabled = currentIndex === deck.length - 1;
+
+  // learned state
+  const isLearned = !!learned[b.n];
+  const lb = document.getElementById('learn-btn');
+  lb.textContent = isLearned ? '✓ Aprendido!' : '✓ Marcar como aprendido';
+  lb.classList.toggle('marked', isLearned);
+  document.getElementById('card-front').classList.toggle('learned-glow', isLearned);
+  document.getElementById('card-back').classList.toggle('learned-glow', isLearned);
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById('card-body').classList.toggle('flipped', isFlipped);
+}
+
+function navigate(dir) {
+  const next = currentIndex + dir;
+  if (next < 0 || next >= deck.length) return;
+  currentIndex = next;
+  showCard(false);
+}
+
+function toggleLearned() {
+  const b = deck[currentIndex];
+  if (learned[b.n]) delete learned[b.n];
+  else learned[b.n] = true;
+  localStorage.setItem('bible_learned', JSON.stringify(learned));
+  showCard(true);
+  updateProgress();
+}
+
+function resetLearned() {
+  if (!confirm('Resetar todos os aprendidos?')) return;
+  learned = {};
+  localStorage.removeItem('bible_learned');
+  showCard(true);
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = BOOKS.length;
+  const count = Object.keys(learned).length;
+  const pct = (count / total) * 100;
+  document.getElementById('prog-bar').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = `${count} / ${total} aprendidos`;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'ArrowLeft')  navigate(-1);
+  if (e.code === 'ArrowRight') navigate(1);
+  if (e.code === 'Space') { e.preventDefault(); flipCard(); }
+});
+
+showCard(false);
+updateProgress();
+</script>
+</body>
+</html>
