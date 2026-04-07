@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
 <title>Senna Tetris - Homenagem a Ayrton Senna</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Racing+Sans+One&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Racing+Sans+One&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 button{touch-action:manipulation;cursor:pointer}
 html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Arial,sans-serif;background:#000}
@@ -132,7 +133,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Arial,sa
 <div class="intro-dot" data-slide="3"></div>
 <div class="intro-dot" data-slide="4"></div>
 </div>
-<button id="intro-start-btn" onclick="window._launchFromIntro&&window._launchFromIntro()">INICIAR CORRIDA</button>
+<button id="intro-start-btn" onclick="launchFromIntro()">INICIAR CORRIDA</button>
 </div>
 
 <div id="header">
@@ -170,7 +171,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Arial,sa
 <div id="start-screen">
 <h2>&#127463;&#127479; SENNA TETRIS &#127463;&#127479;</h2>
 <div class="subtitle">Complete linhas para acelerar!<br>Cada nivel e uma fase da carreira do Senna.</div>
-<button id="start-btn" onclick="window._startGame&&window._startGame()">LARGAR!</button>
+<button id="start-btn" onclick="startGame()">LARGAR!</button>
 <div class="senna-quote">"Se voce nao vai com tudo, por que iria?"<br>- Ayrton Senna</div>
 </div>
 <div id="game-over-screen">
@@ -178,11 +179,11 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Arial,sa
 <div class="final-score" id="final-score">0</div>
 <div style="color:#aaa;font-size:12px;font-family:'Orbitron',sans-serif">Pontuacao Final</div>
 <div id="game-over-level" style="color:#FFD700;font-size:11px;margin-top:5px;font-family:'Orbitron',sans-serif"></div>
-<button id="restart-btn" onclick="window._startGame&&window._startGame()">NOVA CORRIDA</button>
+<button id="restart-btn" onclick="startGame()">NOVA CORRIDA</button>
 </div>
 </div>
 <script>
-(function(){
+try{
 // ===== SENNA CAREER LEVELS =====
 const SENNA_LEVELS=[
   {name:'Toleman 1984',desc:'Monaco sob chuva',color:'#1E88E5'},
@@ -252,7 +253,7 @@ document.querySelectorAll('.intro-dot').forEach(d=>{
   });
 });
 
-window._launchFromIntro=function(){
+function launchFromIntro(){
   clearInterval(introAutoTimer);
   introScreen.style.opacity='0';
   introScreen.style.transition='opacity 0.8s';
@@ -262,14 +263,14 @@ window._launchFromIntro=function(){
   },800);
   initAudio();
   playF1Sound('engine');
-};
+}
 
 // Also allow tapping slides to advance, and skip intro by tapping the last slide
 document.querySelectorAll('.intro-slide').forEach(s=>{
   s.addEventListener('click',()=>{
     clearInterval(introAutoTimer);
     if(currentSlide<totalSlides-1)showSlide(currentSlide+1);
-    else window._launchFromIntro&&window._launchFromIntro();
+    else launchFromIntro();
   });
 });
 
@@ -747,11 +748,8 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-// Expose startGame globally for onclick handlers
-window._startGame=startGame;
-
 setTimeout(resize,100);
-})();
+}catch(e){document.body.innerHTML='<div style="color:red;padding:20px;font-size:16px">ERRO: '+e.message+'<br>Linha: '+e.stack+'</div>';}
 </script>
 </body>
 </html>
