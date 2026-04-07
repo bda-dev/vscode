@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jogos Bíblicos</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(160deg, #0a0a1a 0%, #1a0a00 50%, #0a1a0a 100%);
+  font-family: 'Georgia', serif;
+  color: #e8e0ff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+header h1 {
+  font-size: 2.4rem;
+  background: linear-gradient(90deg, #f0c040, #c0a8ff, #80ffb8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 3px;
+  text-shadow: none;
+}
+
+header p {
+  font-size: 1rem;
+  color: #7070aa;
+  margin-top: 8px;
+  letter-spacing: 1px;
+}
+
+.cards {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 860px;
+  width: 100%;
+}
+
+.game-card {
+  flex: 1 1 340px;
+  max-width: 380px;
+  border-radius: 20px;
+  padding: 36px 32px;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  overflow: hidden;
+  transition: transform .25s, box-shadow .25s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.game-card:hover {
+  transform: translateY(-6px);
+}
+
+.game-card-memory {
+  background: linear-gradient(145deg, #2c1505, #5a3010);
+  border: 2px solid #c9a96e;
+  box-shadow: 0 8px 32px #c9a96e22;
+}
+
+.game-card-memory:hover {
+  box-shadow: 0 16px 48px #f0c04044;
+  border-color: #f0c040;
+}
+
+.game-card-flash {
+  background: linear-gradient(145deg, #1a1040, #2d1a70);
+  border: 2px solid #7060c0;
+  box-shadow: 0 8px 32px #6040bb22;
+}
+
+.game-card-flash:hover {
+  box-shadow: 0 16px 48px #c0a8ff44;
+  border-color: #c0a8ff;
+}
+
+.game-icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.game-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.game-card-memory .game-title { color: #f0c040; }
+.game-card-flash  .game-title { color: #c0a8ff; }
+
+.game-desc {
+  font-size: 0.9rem;
+  color: #bbb;
+  line-height: 1.6;
+}
+
+.game-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.tag {
+  font-size: 0.7rem;
+  padding: 3px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-weight: bold;
+}
+
+.game-card-memory .tag { background: #f0c04022; color: #f0c040; border: 1px solid #f0c04044; }
+.game-card-flash  .tag { background: #c0a8ff22; color: #c0a8ff; border: 1px solid #c0a8ff44; }
+
+.play-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-family: 'Georgia', serif;
+  font-size: 0.95rem;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: filter .2s;
+  width: fit-content;
+}
+
+.game-card-memory .play-btn { background: #f0c040; color: #1a0a00; }
+.game-card-flash  .play-btn { background: #6040bb; color: #fff; }
+
+.game-card:hover .play-btn { filter: brightness(1.15); }
+
+footer {
+  margin-top: 56px;
+  font-size: 0.75rem;
+  color: #404060;
+  text-align: center;
+  letter-spacing: 1px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>✦ Jogos Bíblicos ✦</h1>
+  <p>Aprenda enquanto joga</p>
+</header>
+
+<div class="cards">
+
+  <a class="game-card game-card-memory" href="memory-game-chosen.html">
+    <div class="game-icon">🎴</div>
+    <div class="game-title">Jogo da Memória<br>O Escolhido</div>
+    <div class="game-desc">
+      Encontre os pares dos personagens da série <em>The Chosen</em>.
+      Três níveis de dificuldade, cronômetro e pontuação.
+    </div>
+    <div class="game-tags">
+      <span class="tag">Fácil · Médio · Difícil</span>
+      <span class="tag">18 personagens</span>
+    </div>
+    <div class="play-btn">▶ Jogar</div>
+  </a>
+
+  <a class="game-card game-card-flash" href="bible-flashcards.html">
+    <div class="game-icon">📖</div>
+    <div class="game-title">Flashcards<br>Bíblicos</div>
+    <div class="game-desc">
+      Decore os 66 livros da Bíblia e seus versículos-chave.
+      Filtre por testamento, embaralhe e marque o progresso.
+    </div>
+    <div class="game-tags">
+      <span class="tag">66 livros</span>
+      <span class="tag">AT + NT</span>
+      <span class="tag">Progresso salvo</span>
+    </div>
+    <div class="play-btn">▶ Estudar</div>
+  </a>
+
+</div>
+
+<footer>Jogos Bíblicos &mdash; feitos com carinho</footer>
+
+</body>
+</html>
